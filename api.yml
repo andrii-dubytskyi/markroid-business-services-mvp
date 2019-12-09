@@ -1,0 +1,192 @@
+openapi: 3.0.0
+info:
+  title: Markroid Business Services
+  version: '0.1'
+  description: This API is to be used by front-end clients to interact with Markroid Business Servies
+servers:
+  - url: 'https://markroid.com/api/v0.1'
+    description: Base Server
+paths:
+  /organizations:
+    get:
+      summary: Get Organizations List
+      tags:
+        - Organizations Management
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: Total count of organizations associated with user
+                  items:
+                    type: array
+                    description: List of organizations
+                    items:
+                      type: object
+                      description: Organization Item
+                      properties:
+                        id:
+                          type: integer
+                          description: ID of organization
+                        name:
+                          type: string
+                          description: Name of the organization
+                        logo:
+                          type: string
+                          description: Logo of the organization
+                        user_role:
+                          type: object
+                          required:
+                            - id
+                            - role
+                            - permissions
+                          properties:
+                            id:
+                              type: integer
+                              description: Role ID
+                            role:
+                              type: string
+                              description: Role name
+                            permissions:
+                              type: array
+                              description: Permissions list
+                              items:
+                                type: string
+                      required:
+                        - id
+                        - name
+                        - user_role
+                required:
+                  - count
+                  - items
+      operationId: get-organizations
+      description: Returns a list of all organizations for current user
+      parameters:
+        - schema:
+            type: integer
+            default: '100'
+            minimum: 1
+          in: query
+          name: limit
+          description: Number of items to return
+        - schema:
+            type: integer
+            default: '0'
+            minimum: 0
+          in: query
+          name: offset
+          description: Number of items to skip
+  '/organizations/{id}':
+    parameters:
+      - type: string
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Organization ID
+    get:
+      summary: Get Specific Organization Information
+      tags:
+        - Organizations Management
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: ID of the organization
+                  name:
+                    type: string
+                    description: Name of the organization
+                  description:
+                    type: string
+                    description: Short name of the organization
+                  logo:
+                    type: string
+                    description: Logo url
+                  address:
+                    type: string
+                    description: Headquarters address
+                  management:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    description: List of organization managers. By default organization owner is the first manager and CEO
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: ID of the user
+                        name:
+                          type: string
+                          description: Name of the user
+                        role:
+                          type: object
+                          description: Role in organization
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                        position:
+                          type: string
+                          description: Position (e.g. CEO)
+                  websites:
+                    type: array
+                    description: List of websites that organization owns
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        platform:
+                          type: string
+                          description: 'One of the system pre-defined platforms (e.g. facebook, twitter, website)'
+                        url:
+                          type: string
+                  positions:
+                    type: object
+                    description: Business main numbers
+                    properties:
+                      offerings:
+                        type: number
+                        description: Number of the offerings currently active in organization
+                      customers:
+                        type: number
+                        description: Number of customers to date
+                      employees:
+                        type: number
+                        description: Current number of employees
+                      revenue:
+                        type: number
+                        description: Revenue amount to date
+      operationId: 'get-organizations-{id}'
+      description: Retrieves information regarding specific Organization by its ID
+      parameters: []
+      requestBody: {}
+components:
+  schemas:
+    Organization:
+      title: Organization
+      type: object
+      properties:
+        id:
+          type: string
+  securitySchemes:
+    access-token:
+      name: API Key
+      type: apiKey
+      in: header
+      description: Access Token has to be passed with headers upon every request  
